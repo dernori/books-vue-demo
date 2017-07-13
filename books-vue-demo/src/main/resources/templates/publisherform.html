@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('A book')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="add-publisher">
+		<h1>Add new publisher</h1>
+		<form class="form-horizontal">				
+			<div class="form-group">
+				<label for="name" class="control-label col-md-3 req">Name</label>
+				<div class="controls col-md-9">
+					<input v-model="publisher.name" name="name" type="text" class="form-control"/>
+				</div>
+			</div>		
+			<div class="form-group topspace">
+				<div class="col-md-12 text-right">
+					<button type="button" v-on:click="savePublisher" class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+	/*<![CDATA[*/
+    var app = new Vue({
+        el: '#add-publisher',
+        data : {
+        	publisher : {
+        		name : null       		
+        	}
+        },
+        methods: {
+        	savePublisher: function () {
+            	axios.post('/api/publishers', 
+                       	this.publisher,
+                       	{ headers: {
+                       		'Content-type': 'application/json',
+                       	}
+                	}).then(function (response) {
+                       	redirect('/publishers');
+                });
+          	}
+        }
+    });
+    /*]]>*/
+</script>
+</html>

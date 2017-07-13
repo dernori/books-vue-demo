@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('A book')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="edit-book">
+		<h1>{{ this.getBookId() == -1 ? "Add new book" : "Edit book" }}</h1>
+		<form class="form-horizontal">				
+			<div class="form-group">
+				<label for="title" class="control-label col-md-3 req">Title</label>
+				<div class="controls col-md-9">
+					<input v-model="book.title" name="title" type="text" class="form-control"/>
+				</div>
+			</div>		
+			<div class="form-group">
+				<label for="author" class="control-label col-md-3 req">Author</label>
+				<div class="controls col-md-3">
+					<select v-model="book.author" class="form-control" name="author">
+						<option selected="true" disabled="true"></option>
+		                <option v-for="auth in authors" v-bind:value="auth">
+		                    {{ auth.name }}
+		                </option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="isbn" class="control-label col-md-3 req">ISBN</label>
+				<div class="controls col-md-9">
+					<input v-model="book.isbn" name="isbn" type="text" class="form-control"/>
+				</div>
+			</div>	
+			<div class="form-group">
+				<label for="published" class="control-label col-md-3 req">Published</label>
+				<div class="controls col-md-9">
+					<input v-model="book.published" name="published" type="number" class="form-control"/>
+				</div>
+			</div>	
+			<div class="form-group">
+				<label for="publisher" class="control-label col-md-3 req">Publisher</label>
+				<div class="controls col-md-3">
+					<select v-model="book.publisher" class="form-control" name="publisher">
+						<option selected="true" disabled="true"></option>
+		                <option v-for="pub in publishers" v-bind:value="pub">
+		                    {{ pub.name }}
+		                </option>
+					</select>
+				</div>
+			</div>	
+			<div class="form-group">
+				<label for="description" class="control-label col-md-3">Description</label>
+				<div class="controls col-md-9">
+					<textarea v-model="book.description" name="description" class="form-control"></textarea>
+				</div>
+			</div>	
+			<div class="form-group topspace">
+				<div class="col-md-12 text-right">
+					<button type="button" v-on:click="saveBook" class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+	/*<![CDATA[*/
+    var app = new Vue({
+        el: '#edit-book',
+        data : {
+        	authors : [],
+        	publishers : [],
+        	book : {
+        		title : null,
+        		author : null,
+        		isbn : null,
+        		publisher : null,
+        		published : null,
+        		description : null        		
+        	}
+        },
+        mounted: function (){
+   			this.$nextTick(function() {
+   		      	this.getAuthors().then(function (response) {
+		            this.authors = response.data;
+	   		    }.bind(this));
+   		    	 this.getPublishers().then(function (response) {
+		            this.publishers = response.data;
+	   		    }.bind(this))
+	   		    if(this.getBookId() != -1) {
+	   		    	this.getData()
+	   		    	.then(function (response) {
+			            this.book = response.data;
+		   		    }.bind(this))
+		   		    .then(function () {
+		   		    	setDisplay('#edit-book', 'block');
+		   		    })
+	   		    } else {
+	   		    	setDisplay('#edit-book', 'block'); // set display (it doesn't show up by default)
+	   		    }
+   		    })
+        },
+        methods: {
+        	getData: function () {
+                return axios.get("/api/books/" + this.getBookId());
+          	},
+        	getAuthors: function () {
+                return axios.get("/api/authors/");
+          	},
+          	getPublishers: function () {
+                return axios.get("/api/publishers/");
+          	},
+          	getBookId: function (){
+                var splitted = window.location.href.split('/');
+                var s = splitted[splitted.length-1];
+                return (s == "bookform" ? -1 : s);
+            },
+          	saveBook: function () {
+            	if(this.getBookId() == -1) {
+            		axios.post('/api/books', 
+                        	this.book,
+                        	{ headers: {
+                        		'Content-type': 'application/json',
+                        	}
+                  		}).then(function (response) {
+                        	redirect('/books/'+ response.data.id);
+                    });
+            	} else {
+            		axios.put('/api/books/' + this.getBookId(), 
+                    	this.book,
+                    	{ headers: {
+                        	'Content-type': 'application/json',
+                        }
+                  	}).then(function(response) {
+                       	redirect('/books/'+ response.data.id);
+                    });
+            	}
+          	}
+        }
+    });
+    /*]]>*/
+</script>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('A book')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="single-book">
+		<div v-if="book">
+			<h1>{{book.title}}</h1>
+			<div class="row">
+				<div class="btn-group pull-right">
+				  <button type="button" class="btn btn-primary" v-on:click="editBook">Edit</button>
+				  <button type="button" class="btn btn-primary" v-on:click="removeBook">Delete</button>
+				</div>
+			</div>		
+			<div class="row">
+				<div class="col-md-2 text-right">
+					<p>Author</p>
+				</div>
+				<div class="col-md-10">
+					<p>{{book.author}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-2 text-right">
+					<p>ISBN</p>
+				</div>
+				<div class="col-md-10">
+					<p>{{book.isbn}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-2 text-right">
+					<p>Published</p>
+				</div>
+				<div class="col-md-10">
+					<p>{{book.published}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-2 text-right">
+					<p>Publisher</p>
+				</div>
+				<div class="col-md-10">
+					<p>{{book.publisher}}</p>
+				</div>
+			</div>
+			<div class="row topspace">
+				<div class="col-md-12">
+					<p>{{book.description}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+	/*<![CDATA[*/
+	    var app = new Vue({
+	        el: '#single-book',
+	        data : {
+	        	book: null
+	        },
+	        mounted: function (){
+	   			this.$nextTick(function() {
+	   		      	this.getData()
+	   		      	.then(function (response) {
+				    	response.data.author = response.data.author.name;
+						response.data.publisher = response.data.publisher.name;
+				        this.book = response.data;
+		   		    }.bind(this))
+		   		    .then(function (response) {
+		   		    	setDisplay('#single-book', 'block'); // set display (it doesn't show up by default)
+		   		    });
+	   		    })
+	        },
+	        methods: {
+	        	getData: function () {
+	                return axios.get("/api/books/" + this.getBookId());
+	          	},
+	            getBookId: function (){
+	                var splitted = window.location.href.split('/');
+	                return splitted[splitted.length-1];
+	            },
+	            removeBook: function () {
+	            	axios.delete("/api/books/"+ this.getBookId())
+	            		.then(function (response) {
+	            	    	redirect("/books");
+	            		})
+	            		.catch(function (error) {
+	            			redirect("/books");
+	            		});
+	            }, 
+	            editBook: function () {
+	            	redirect('/bookform/' + this.getBookId());
+	            }
+	        }
+	    });
+    /*]]>*/
+</script>
+</html>

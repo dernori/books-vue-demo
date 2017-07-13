@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('Books')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="publishers">
+		<h1>Publishers</h1>
+		<div class="row">
+			<div class="btn-group pull-right">
+			  <button type="button" class="btn btn-primary" v-on:click="addPublisher">Add new</button>
+			</div>
+		</div>
+		<div class="row">
+			<ul class="topspace">
+				<li v-for="publisher in publishers">{{publisher.name}}</li>
+			</ul>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+<script>
+		/*<![CDATA[*/
+	    var app = new Vue({
+	        el: '#publishers',
+	        data : { 
+	        	publishers: []
+	   		},
+	        mounted: function(){
+	   			this.$nextTick(function() {
+	   		      	this.getData().then(function (response) {
+	                	this.publishers = response.data;
+	   		      	}.bind(this))
+	   		      	.then(function() {
+	                	setDisplay('#publishers', 'block');
+	   		      	});
+	   		    })
+	        },
+	        methods: {
+	        	getData: function() {
+	                 return axios.get("api/publishers");
+	           	},
+	           	addPublisher: function() {
+	            	redirect('/publisherform');
+	            }
+	        }, 
+	    });
+		
+	    /*]]>*/
+	</script>
+</html>

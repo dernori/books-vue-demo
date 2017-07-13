@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('Books')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="authors">
+		<h1>Authors</h1>
+		<div class="row">
+			<div class="btn-group pull-right">
+			  <button type="button" class="btn btn-primary" v-on:click="addAuthor">Add new</button>
+			</div>
+		</div>
+		<div class="row">
+			<ul class="topspace">
+				<li v-for="author in authors">
+			      <a v-bind:href="getAuthorLink(author)">{{author.name}}</a>
+			    </li>
+			</ul>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+<script>
+		/*<![CDATA[*/
+		
+	    var app = new Vue({
+	        el: '#authors',
+	        data : { 
+	        	authors: []
+	   		},
+	        mounted : function (){
+	   			this.$nextTick(function() {
+	   		      	this.getData()
+	   		      	.then(function(response) {
+	   		         	this.authors = response.data;
+	   		      	}.bind(this))
+	   		      	.then(function(response) {
+	   		      		setDisplay('#authors', 'block');
+	   		      	});
+	   		    })
+	        },
+	        methods: {
+	        	getData: function() {
+	                 return axios.get("api/authors");
+	           	},
+	           	getAuthorLink: function(author){
+	                return '/authors/' + author.id;
+	            }, 
+	            addAuthor: function() {
+	            	redirect('/authorform');
+	            }
+	        }, 
+	    });
+	    /*]]>*/
+	</script>
+</html>

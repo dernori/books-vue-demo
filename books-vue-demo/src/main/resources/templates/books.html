@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('Books')" />
+<body>
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main">
+		<div class="container topspace">
+			<div class="row" id="buttons">
+				<div class="btn-group pull-right">
+				  <button type="button" class="btn btn-primary" v-on:click="addBook">Add new</button>
+				</div>
+			</div>		
+			<table id="books" class="table table-striped">
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>authors</th>
+						<th>title</th>
+						<th>isbn</th>
+						<th>published</th>
+						<th>publisher</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="book in books" track-by="id">
+						<td>{{book.id}}</td>
+						<td>{{book.author}}</td>
+						<td><a v-bind:href="getBookLink(book)">{{book.title}}</a></td>
+						<td>{{book.isbn}}</td>
+						<td>{{book.published}}</td>
+						<td>{{book.publisher}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+<script>
+		/*<![CDATA[*/
+		
+	    var app = new Vue({
+	        el: '#books',
+	        data : { 
+	        	books: []
+	   		},
+	        mounted: function (){
+	   			this.$nextTick(function() {
+	   		      	this.getData().then(function(response) {
+	               		for(var j = 0; j < response.data.length; j++) {
+			    			response.data[j].author = (response.data[j].author == null ? "-" : response.data[j].author.name);
+			    			response.data[j].publisher = (response.data[j].publisher == null ? "-" : response.data[j].publisher.name);
+                 		}
+	                	this.books = response.data;
+	   		      	}.bind(this))
+	   		      	.then(function (response) {
+	   		     		setDisplay('#books', 'table'); // set display (it doesn't show up by default)
+	   		     		var timer = setTimeout(function() {
+	   		     			makeTableFancy('#books', 10); // initializing datatable
+	   		     		}, 1000);	   		     		
+	   		      	});	   		     	
+	   		    })
+	        },
+	        methods: {
+	        	getData: function() {
+	                 return axios.get('api/books');
+	           	},
+	            getBookLink: function (book){
+	                return '/books/' + book.id;
+	            },
+	            addBook: function () {
+	            	redirect('/newbook');
+	            }
+	        }, 
+	    });
+		
+	    var app = new Vue({
+	        el: '#buttons',
+	        data : {},
+	        methods: {
+	            addBook: function() {
+	            	redirect('/bookform');
+	            }
+	        }, 
+	    });
+	    /*]]>*/
+	</script>
+</html>

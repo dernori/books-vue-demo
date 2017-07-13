@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('Books')" />
+<body>
+	<div id="root">
+		<div th:replace="fragments/nav :: nav"></div>
+		<div class="container" role="main">
+			<div class="jumbotron">
+				<h1>Collection of my books</h1>
+				<p>This is a demo app. It uses Spring Boot with Thymeleaf and Vue.js.</p>
+			</div>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+</html>

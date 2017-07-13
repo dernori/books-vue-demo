@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/header :: header('A book')" />
+<body id="body">
+	<div th:replace="fragments/nav :: nav"></div>
+	<div class="container" role="main" id="single-author">
+		<div v-if="author">
+			<h1>{{author.name}}</h1>
+			<ul class="topspace">
+				<li v-for="book in author.books">
+			      <a v-bind:href="getBookLink(book)">{{book.title}}</a>
+			    </li>
+			</ul>
+		</div>
+	</div>
+</body>
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+	/*<![CDATA[*/
+    var app = new Vue({
+        el: '#single-author',
+        data : {
+        	author: null
+        },
+        mounted: function (){
+   			this.$nextTick(function() {
+   				var author = null;
+   				this.getData().then(
+   					function(response) {
+   						author = response.data;
+   					}	
+   				);
+   				this.getExtData().then(
+   	   				function(response) {
+   	   					author.books = response.data;
+   	   					this.author = author;
+   	   				}.bind(this)	
+   	   			).then(function(response) {
+   	   				setDisplay('#single-author', 'block'); // set display (it doesn't show up by default)
+   	   			});
+   		    })
+        },
+        methods: {
+        	getData: function () {
+                return axios.get("/api/authors/" + this.getAuthorId());
+          	},
+          	getExtData: function () {
+                return axios.get("/api/authors/" + this.getAuthorId() + "/books");
+          	},
+          	getAuthorId: function () {
+                var splitted = window.location.href.split('/');
+                return splitted[splitted.length-1];
+            },
+            getBookLink: function (book) {
+	        	return '/books/' + book.id;
+            }
+        }
+    });
+    /*]]>*/
+</script>
+</html>
