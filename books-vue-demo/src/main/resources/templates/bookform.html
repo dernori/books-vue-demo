@@ -9,13 +9,25 @@
 			<div class="form-group">
 				<label for="title" class="control-label col-md-3 req">Title</label>
 				<div class="controls col-md-9">
-					<input v-model="book.title" name="title" type="text" class="form-control"/>
+					<input 	name="title" type="text" class="form-control"
+						   	v-model="book.title" 
+							v-on:input="$v.book.title.$touch"
+   							v-bind:class="{error: $v.book.title.$error, valid: !$v.book.title.$invalid}"/>
 				</div>
-			</div>		
+			</div>	
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.title.required">Field is required</span>	
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="author" class="control-label col-md-3 req">Author</label>
 				<div class="controls col-md-3">
-					<select v-model="book.author" class="form-control" name="author">
+					<select class="form-control" name="author"
+							v-model="book.author"
+							v-on:input="$v.book.author.$touch"
+   							v-bind:class="{error: $v.book.author.$error, valid: !$v.book.author.$invalid}">
 						<option selected="true" disabled="true"></option>
 		                <option v-for="auth in authors" v-bind:value="auth">
 		                    {{ auth.name }}
@@ -24,28 +36,65 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.author.required">Field is required</span>
+				</div>
+			</div>
+			<div class="form-group">
 				<label for="isbn" class="control-label col-md-3 req">ISBN</label>
 				<div class="controls col-md-9">
-					<input v-model="book.isbn" name="isbn" type="text" class="form-control"/>
+					<input 	name="isbn" type="text" class="form-control"
+							v-model="book.isbn"
+							v-on:input="$v.book.isbn.$touch"
+   							v-bind:class="{error: $v.book.isbn.$error, valid: !$v.book.isbn.$invalid}" />
 				</div>
 			</div>	
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.required">Field is required</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.numeric">Only numeric numbers are allowed.</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.minLength">ISBN must have at least {{$v.book.isbn.$params.minLength.min}} numbers.</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.maxLength">ISBN must have at most {{$v.book.isbn.$params.maxLength.max}} numbers.</span>
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="published" class="control-label col-md-3 req">Published</label>
 				<div class="controls col-md-9">
-					<input v-model="book.published" name="published" type="number" class="form-control"/>
+					<input 	name="published" type="number" class="form-control"
+							v-model="book.published" 
+							v-on:input="$v.book.published.$touch"
+   							v-bind:class="{error: $v.book.published.$error, valid: !$v.book.published.$invalid}" />
 				</div>
-			</div>	
+			</div>
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.published.required">Field is required</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.published.numeric">Only numeric numbers are allowed.</span>	
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="publisher" class="control-label col-md-3 req">Publisher</label>
 				<div class="controls col-md-3">
-					<select v-model="book.publisher" class="form-control" name="publisher">
+					<select class="form-control" name="publisher"
+							v-on:input="$v.book.publisher.$touch"
+   							v-bind:class="{error: $v.book.publisher.$error, valid: !$v.book.publisher.$invalid}"
+							v-model="book.publisher" >
 						<option selected="true" disabled="true"></option>
 		                <option v-for="pub in publishers" v-bind:value="pub">
 		                    {{ pub.name }}
 		                </option>
 					</select>
 				</div>
-			</div>	
+			</div>
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.publisher.required">Field is required</span>
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="description" class="control-label col-md-3">Description</label>
 				<div class="controls col-md-9">
@@ -59,11 +108,23 @@
 			</div>
 		</form>
 	</div>
+	
+
 </body>
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
 	/*<![CDATA[*/
+		
+	//validation things
+	Vue.use(window.vuelidate.default);
+	var validationMixin = window.vuelidate.validationMixin;
+	var required = window.validators.required;
+	var minLength = window.validators.minLength;
+	var maxLength = window.validators.maxLength;
+	var numeric = window.validators.numeric;
+	var alphaNum = window.validators.alphaNum;
+		
     var app = new Vue({
         el: '#edit-book',
         data : {
@@ -77,6 +138,15 @@
         		published : null,
         		description : null        		
         	}
+        },
+        validations: {
+        	book: {
+        		title: { required: required},
+        		author: { required: required },
+        		isbn: { required: required, minLength: minLength(10), maxLength: maxLength(13), numeric: numeric},
+        		publisher: { required: required },
+        		published: { required: required, numeric: numeric }
+       	 	}
         },
         mounted: function (){
    			this.$nextTick(function() {
@@ -115,6 +185,11 @@
                 return (s == "bookform" ? -1 : s);
             },
           	saveBook: function () {
+          		this.$v.book.$touch();
+
+                if(this.$v.book.$error) {
+                  return;
+                }
             	if(this.getBookId() == -1) {
             		axios.post('/api/books', 
                         	this.book,

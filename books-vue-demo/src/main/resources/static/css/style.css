@@ -181,6 +181,36 @@ label {
 	padding-left: 15px;
 }
 
+.error {
+  border-color: red;
+  background: #FDD;
+}
+
+.error:focus {
+  outline-color: #F99;
+}
+
+.valid {
+  border-color: #5A5;
+  background: #EFE;
+}
+
+.valid:focus {
+  outline-color: #8E8;
+}
+
+.form-group__message {
+    color: #f57f6c;
+    font-size: .75em;
+	line-height: 1;
+	display: block;
+}
+
+.errors {
+	height: 10px;
+    margin-top: -7px;
+}
+
 ::-webkit-scrollbar {
     width: 10px
 }
