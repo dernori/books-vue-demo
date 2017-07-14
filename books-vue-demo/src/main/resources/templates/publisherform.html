@@ -9,9 +9,18 @@
 			<div class="form-group">
 				<label for="name" class="control-label col-md-3 req">Name</label>
 				<div class="controls col-md-9">
-					<input v-model="publisher.name" name="name" type="text" class="form-control"/>
+					<input 	name="name" type="text" class="form-control"
+							v-model="publisher.name"
+							v-on:input="$v.publisher.name.$touch"
+   							v-bind:class="{error: $v.publisher.name.$error, valid: !$v.publisher.name.$invalid}" />
 				</div>
 			</div>		
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.publisher.name.$dirty &amp;&amp; !$v.publisher.name.required">Field is required</span>	
+				</div>
+			</div>
 			<div class="form-group topspace">
 				<div class="col-md-12 text-right">
 					<button type="button" v-on:click="savePublisher" class="btn btn-primary">Save</button>
@@ -24,6 +33,11 @@
 
 <script>
 	/*<![CDATA[*/
+		
+	//validation things
+	Vue.use(window.vuelidate.default);
+	var required = window.validators.required;	
+		
     var app = new Vue({
         el: '#add-publisher',
         data : {
@@ -31,8 +45,18 @@
         		name : null       		
         	}
         },
+        validations: {
+        	publisher: {
+        		name: { required: required }
+       	 	}
+        },
         methods: {
         	savePublisher: function () {
+        		this.$v.publisher.$touch();
+
+                if(this.$v.publisher.$error) {
+                  return;
+                }
             	axios.post('/api/publishers', 
                        	this.publisher,
                        	{ headers: {

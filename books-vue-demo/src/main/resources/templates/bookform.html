@@ -55,8 +55,8 @@
 				<div class="col-md-9 errors">
 					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.required">Field is required</span>
 					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.numeric">Only numeric numbers are allowed.</span>
-					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.minLength">ISBN must have at least {{$v.book.isbn.$params.minLength.min}} numbers.</span>
-					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.maxLength">ISBN must have at most {{$v.book.isbn.$params.maxLength.max}} numbers.</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.minLength">ISBN must have at least {{$v.book.isbn.$params.minLength.min}} characters.</span>
+					<span class="form-group__message" v-if="$v.book.isbn.$dirty &amp;&amp; !$v.book.isbn.maxLength">ISBN must have at most {{$v.book.isbn.$params.maxLength.max}} characters.</span>
 				</div>
 			</div>
 			<div class="form-group">

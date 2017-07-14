@@ -9,9 +9,18 @@
 			<div class="form-group">
 				<label for="name" class="control-label col-md-3 req">Name</label>
 				<div class="controls col-md-9">
-					<input v-model="author.name" name="name" type="text" class="form-control"/>
+					<input 	name="name" type="text" class="form-control"
+							v-model="author.name"
+							v-on:input="$v.author.name.$touch"
+   							v-bind:class="{error: $v.author.name.$error, valid: !$v.author.name.$invalid}" />
 				</div>
 			</div>		
+			<div class="form-group">
+				<div class="col-md-3"></div>
+				<div class="col-md-9 errors">
+					<span class="form-group__message" v-if="$v.author.name.$dirty &amp;&amp; !$v.author.name.required">Field is required</span>	
+				</div>
+			</div>
 			<div class="form-group topspace">
 				<div class="col-md-12 text-right">
 					<button type="button" v-on:click="saveAuthor" class="btn btn-primary">Save</button>
@@ -24,6 +33,11 @@
 
 <script>
 	/*<![CDATA[*/
+		
+	//validation things
+	Vue.use(window.vuelidate.default);
+	var required = window.validators.required;
+	
     var app = new Vue({
         el: '#add-author',
         data : {
@@ -31,8 +45,18 @@
         		name : null       		
         	}
         },
+        validations: {
+        	author: {
+        		name: { required: required }
+       	 	}
+        },
         methods: {
         	saveAuthor: function () {
+        		this.$v.author.$touch();
+
+                if(this.$v.author.$error) {
+                  return;
+                }
             	axios.post('/api/authors', 
                 	this.author,
                     { headers: {
