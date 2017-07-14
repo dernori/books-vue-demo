@@ -1,7 +1,7 @@
 # books-vue-demo
 Demo project for Spring Boot and Vue.js 
 
-(Thymeleaf, Bootstrap, DataTables, axios are also used)
+(Thymeleaf, Bootstrap, DataTables, axios, Vuelidate are also used)
 
 ## how to run
 This is a Maven project. You can run it by clean install.
